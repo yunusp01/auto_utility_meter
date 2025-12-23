@@ -1,0 +1,32 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Auto Utility Meter",
+        "description": "Select the sensor type and the entity to create utility meters automatically.",
+        "data": {
+          "sensor_type": "What does the source sensor measure?",
+          "source_sensor": "Source Sensor (Energy/Power/Water/Gas)",
+          "intervals": "Time Intervals"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This sensor is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_energy": { "name": "Total Consumption" },
+      "daily": { "name": "Daily Consumption" },
+      "hourly": { "name": "Hourly Consumption" },
+      "weekly": { "name": "Weekly Consumption" },
+      "monthly": { "name": "Monthly Consumption" },
+      "yearly": { "name": "Yearly Consumption" }
+    }
+  }
+}

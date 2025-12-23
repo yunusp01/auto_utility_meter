@@ -1,0 +1,32 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Auto Utility Meter konfigurieren",
+        "description": "Wähle den Sensortyp und die Entität aus, um automatisch Verbrauchszähler zu erstellen.",
+        "data": {
+          "sensor_type": "Was misst der Quell-Sensor?",
+          "source_sensor": "Eingangssensor (Energie/Leistung/Wasser/Gas)",
+          "intervals": "Zeitintervalle"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Dieser Sensor wurde bereits konfiguriert."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_energy": { "name": "Gesamtverbrauch" },
+      "daily": { "name": "Täglicher Verbrauch" },
+      "hourly": { "name": "Stündlicher Verbrauch" },
+      "weekly": { "name": "Wöchentlicher Verbrauch" },
+      "monthly": { "name": "Monatlicher Verbrauch" },
+      "yearly": { "name": "Jährlicher Verbrauch" }
+    }
+  }
+}
