@@ -4,6 +4,7 @@
   "version": "1.0.2",
   "config_flow": true,
   "documentation": "https://github.com/yunusp01/auto_utility_meter",
+  "issue_tracker": "https://github.com/yunusp01/auto_utility_meter/issues",
   "dependencies": ["utility_meter", "integration"],
   "codeowners": ["@yunusp01"],
   "iot_class": "calculated"
