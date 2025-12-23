@@ -1,4 +1,4 @@
-# <img src="images/logo.png" width="50" height="50"> Auto Utility Meter
+# <img src="images/logo.png" width="50" height="50"> 
 # Auto Utility Meter
 
 Auto Utility Meter is a Home Assistant integration that simplifies energy monitoring. It automatically converts Power (W) into Energy (kWh) using the Riemann Sum and creates utility meters for your chosen intervals.
