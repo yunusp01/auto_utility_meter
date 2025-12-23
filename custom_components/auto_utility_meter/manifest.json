@@ -1,0 +1,10 @@
+{
+  "domain": "auto_utility_meter",
+  "name": "Auto Utility Meter",
+  "version": "1.0.1",
+  "config_flow": true,
+  "documentation": "",
+  "dependencies": ["utility_meter", "integration"],
+  "codeowners": [],
+  "iot_class": "calculated"
+}
