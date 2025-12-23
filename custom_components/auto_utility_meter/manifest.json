@@ -3,10 +3,8 @@
   "name": "Auto Utility Meter",
   "version": "1.0.2",
   "config_flow": true,
-  "documentation": "",
+  "documentation": "https://github.com/yunusp01/auto_utility_meter",
   "dependencies": ["utility_meter", "integration"],
-  "codeowners": [yunusp01],
+  "codeowners": ["@yunusp01"],
   "iot_class": "calculated"
-
 }
-
