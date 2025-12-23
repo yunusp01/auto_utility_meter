@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Auto Utility Meter konfigurieren",
+        "description": "Wähle einen Sensor und die Zeitintervalle aus, für die automatisch Utility Meter erstellt werden sollen.",
+        "data": {
+          "source_sensor": "Eingangssensor (Energie/Wasser/Gas)",
+          "intervals": "Zeitintervalle"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Dieser Sensor wurde bereits konfiguriert."
+    }
+  }
+}
