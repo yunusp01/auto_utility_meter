@@ -13,28 +13,50 @@ from .const import (
     INTERVAL_OPTIONS, 
     CONF_SENSOR_TYPE, 
     SENSOR_TYPE_KWH,
+    SENSOR_TYPE_WATT,
+    SENSOR_TYPE_GAS,
+    SENSOR_TYPE_WATER,
     SENSOR_TYPE_OPTIONS
 )
+
+# Erlaubte Einheiten für die Validierung
+VALID_UNITS = {
+    SENSOR_TYPE_WATT: ["W", "kW"],
+    SENSOR_TYPE_KWH: ["Wh", "kWh", "MWh"],
+    SENSOR_TYPE_GAS: ["m³", "m3", "ft³"],
+    SENSOR_TYPE_WATER: ["L", "m³", "m3", "gal"]
+}
 
 class AutoUtilityMeterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Setup-Flow für die Ersteinrichtung."""
     VERSION = 1
 
     async def async_step_user(self, user_input=None) -> FlowResult:
+        errors = {}
         if user_input is not None:
-            return self.async_create_entry(title=user_input[CONF_SOURCE_SENSOR], data=user_input)
+            # Validierung der Einheit
+            source_entity_id = user_input[CONF_SOURCE_SENSOR]
+            sensor_type = user_input[CONF_SENSOR_TYPE]
+            
+            state = self.hass.states.get(source_entity_id)
+            if state:
+                unit = state.attributes.get("unit_of_measurement", "")
+                if sensor_type in VALID_UNITS and unit not in VALID_UNITS[sensor_type]:
+                    errors["base"] = "wrong_unit"
+                else:
+                    return self.async_create_entry(title=user_input[CONF_SOURCE_SENSOR], data=user_input)
+            else:
+                errors["base"] = "sensor_not_found"
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                # Typ-Auswahl ganz oben
                 vol.Required(CONF_SENSOR_TYPE, default=SENSOR_TYPE_KWH): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=SENSOR_TYPE_OPTIONS,
                         mode=selector.SelectSelectorMode.DROPDOWN
                     )
                 ),
-                # Quell-Sensor (Domain sensor, device_class wird hier weggelassen um flexibel zu sein)
                 vol.Required(CONF_SOURCE_SENSOR): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="sensor")
                 ),
@@ -45,7 +67,8 @@ class AutoUtilityMeterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         mode=selector.SelectSelectorMode.LIST
                     )
                 ),
-            })
+            }),
+            errors=errors
         )
 
     @staticmethod
@@ -54,14 +77,27 @@ class AutoUtilityMeterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return AutoUtilityMeterOptionsFlowHandler(config_entry)
 
 class AutoUtilityMeterOptionsFlowHandler(config_entries.OptionsFlow):
-    """Verwaltet das Zahnrad-Menü."""
+    """Verwaltet das Zahnrad-Menü (Optionen)."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        pass
+        self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None) -> FlowResult:
+        errors = {}
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            # Gleiche Validierung wie im Haupt-Flow
+            source_entity_id = user_input[CONF_SOURCE_SENSOR]
+            sensor_type = user_input[CONF_SENSOR_TYPE]
+            
+            state = self.hass.states.get(source_entity_id)
+            if state:
+                unit = state.attributes.get("unit_of_measurement", "")
+                if sensor_type in VALID_UNITS and unit not in VALID_UNITS[sensor_type]:
+                    errors["base"] = "wrong_unit"
+                else:
+                    return self.async_create_entry(title="", data=user_input)
+            else:
+                errors["base"] = "sensor_not_found"
 
         options = self.config_entry.options
         data = self.config_entry.data
@@ -92,5 +128,6 @@ class AutoUtilityMeterOptionsFlowHandler(config_entries.OptionsFlow):
                         mode=selector.SelectSelectorMode.LIST
                     )
                 ),
-            })
+            }),
+            errors=errors
         )
