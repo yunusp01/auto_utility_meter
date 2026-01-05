@@ -13,7 +13,9 @@
     },
     "error": {
       "cannot_connect": "Verbindung fehlgeschlagen",
-      "unknown": "Unerwarteter Fehler"
+      "unknown": "Unerwarteter Fehler",
+      "wrong_unit": "Falsche Einheit: Der gewählte Sensor passt nicht zum Typ (z.B. Watt benötigt 'W').",
+      "sensor_not_found": "Sensor nicht gefunden oder hat keinen gültigen Zustand."
     },
     "abort": {
       "already_configured": "Dieser Sensor wurde bereits konfiguriert."
@@ -21,12 +23,34 @@
   },
   "entity": {
     "sensor": {
-      "total_energy": { "name": "Gesamtverbrauch" },
-      "daily": { "name": "Täglicher Verbrauch" },
-      "hourly": { "name": "Stündlicher Verbrauch" },
-      "weekly": { "name": "Wöchentlicher Verbrauch" },
-      "monthly": { "name": "Monatlicher Verbrauch" },
-      "yearly": { "name": "Jährlicher Verbrauch" }
+      "total_energy": {
+        "name": "Gesamtenergie"
+      },
+      "hourly": {
+        "name": "Stündlich"
+      },
+      "daily": {
+        "name": "Täglich"
+      },
+      "weekly": {
+        "name": "Wöchentlich"
+      },
+      "monthly": {
+        "name": "Monatlich"
+      },
+      "yearly": {
+        "name": "Jährlich"
+      }
+    }
+  },
+  "selector": {
+    "sensor_type": {
+      "options": {
+        "watt": "Leistungs-Sensor (Watt)",
+        "kwh": "Energie-Sensor (kWh)",
+        "gas": "Gas-Sensor (m³)",
+        "water": "Wasser-Sensor (L oder m³)"
+      }
     }
   }
 }
