@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Auto Utility Meter",
+        "description": "Select the sensor type and the entity to automatically create utility meters.",
+        "data": {
+          "sensor_type": "What does the source sensor measure?",
+          "source_sensor": "Input sensor (Power/Energy/Water/Gas)",
+          "intervals": "Time intervals"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Connection failed",
+      "unknown": "Unexpected error",
+      "wrong_unit": "Wrong unit: The selected sensor does not match the chosen type (e.g., Watt requires 'W').",
+      "sensor_not_found": "Sensor not found or has no valid state."
+    },
+    "abort": {
+      "already_configured": "This sensor is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_energy": {
+        "name": "Total Energy"
+      },
+      "hourly": {
+        "name": "Hourly"
+      },
+      "daily": {
+        "name": "Daily"
+      },
+      "weekly": {
+        "name": "Weekly"
+      },
+      "monthly": {
+        "name": "Monthly"
+      },
+      "yearly": {
+        "name": "Yearly"
+      }
+    }
+  },
+  "selector": {
+    "sensor_type": {
+      "options": {
+        "watt": "Power sensor (Watt)",
+        "kwh": "Energy sensor (kWh)",
+        "gas": "Gas sensor (m³)",
+        "water": "Water sensor (L or m³)"
+      }
+    }
+  }
+}
