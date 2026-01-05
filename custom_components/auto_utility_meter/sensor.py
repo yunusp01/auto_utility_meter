@@ -14,7 +14,10 @@ from .const import (
     CONF_SOURCE_SENSOR, 
     CONF_INTERVALS, 
     CONF_SENSOR_TYPE, 
-    SENSOR_TYPE_WATT
+    SENSOR_TYPE_WATT,
+    SENSOR_TYPE_KWH,
+    SENSOR_TYPE_GAS,
+    SENSOR_TYPE_WATER
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,12 +43,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
             device_info = {"identifiers": device_entry.identifiers}
             device_name = device_entry.name_by_user or device_entry.name
 
-    clean_base = device_name.replace(" Energy", "").replace(" energy", "").replace(" Energie", "").replace(" energie", "").replace(" Power", "").replace(" power", "")
+    # Verbesserte Namensbereinigung
+    clean_base = device_name
+    for word in [" Energy", " energy", " Energie", " energie", " Power", " power", " Gas", " gas", " Wasser", " water"]:
+        clean_base = clean_base.replace(word, "")
     
     translations = await translation.async_get_translations(hass, hass.config.language, "entity", {DOMAIN})
     actual_source = source_entity_id
 
-    # --- SCHRITT 1: WATT -> KWH UMRECHNUNG ---
+    # --- SCHRITT 1: WATT -> KWH UMRECHNUNG (Nur bei Strom/Watt) ---
     if sensor_type == SENSOR_TYPE_WATT:
         integral_unique_id = f"{entry.entry_id}_total_energy"
         integral_obj_id = f"{clean_base.lower().replace(' ', '_')}_total_energy"
@@ -57,7 +63,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             hass=hass,
             source_entity=source_entity_id,
             name=total_full_name,
-            round_digits=3, # Hohe interne Präzision
+            round_digits=3,
             unit_prefix="k",
             unit_time="h",
             integration_method="left",
@@ -76,9 +82,17 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     # --- SCHRITT 2: UTILITY METER ERSTELLEN ---
     entities = []
+    
+    # Bestimme Suffix für Object ID basierend auf Typ
+    type_suffix = "energy"
+    if sensor_type == SENSOR_TYPE_GAS:
+        type_suffix = "gas"
+    elif sensor_type == SENSOR_TYPE_WATER:
+        type_suffix = "water"
+
     for interval in intervals:
         unique_id = f"{entry.entry_id}_{interval}"
-        obj_id = f"{clean_base.lower().replace(' ', '_')}_{interval}_energy"
+        obj_id = f"{clean_base.lower().replace(' ', '_')}_{interval}_{type_suffix}"
         
         lang_key = f"component.{DOMAIN}.entity.sensor.{interval}.name"
         suffix = translations.get(lang_key, interval.capitalize())
@@ -92,7 +106,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 interval=interval,
                 unique_id=unique_id,
                 device_info=device_info,
-                object_id=obj_id
+                object_id=obj_id,
+                sensor_type=sensor_type # Typ übergeben
             )
         )
 
@@ -102,7 +117,7 @@ class AutoUtilityMeterSensor(UtilityMeterSensor):
     """Spezialisierter Utility Meter Sensor."""
     _attr_has_entity_name = False 
 
-    def __init__(self, hass, source_entity, name, interval, unique_id, device_info, object_id):
+    def __init__(self, hass, source_entity, name, interval, unique_id, device_info, object_id, sensor_type):
         self.entity_id = f"sensor.{object_id}"
         self._attr_unique_id = unique_id
         self._attr_name = name
@@ -126,6 +141,14 @@ class AutoUtilityMeterSensor(UtilityMeterSensor):
         )
         self._attr_device_info = device_info
         self._parent_meter = unique_id
+        
+        # NEU: Device Class basierend auf Typ setzen
+        if sensor_type == SENSOR_TYPE_GAS:
+            self._attr_device_class = "gas"
+        elif sensor_type == SENSOR_TYPE_WATER:
+            self._attr_device_class = "water"
+        else:
+            self._attr_device_class = "energy"
 
     @property
     def name(self) -> str:
