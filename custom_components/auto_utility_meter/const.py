@@ -5,6 +5,8 @@ CONF_SENSOR_TYPE = "sensor_type"
 
 SENSOR_TYPE_WATT = "watt"
 SENSOR_TYPE_KWH = "kwh"
+SENSOR_TYPE_GAS = "gas"
+SENSOR_TYPE_WATER = "water"
 
 INTERVAL_OPTIONS = [
     {"value": "hourly", "label": "Stündlich"},
@@ -17,4 +19,6 @@ INTERVAL_OPTIONS = [
 SENSOR_TYPE_OPTIONS = [
     {"value": SENSOR_TYPE_KWH, "label": "Energie-Sensor (kWh)"},
     {"value": SENSOR_TYPE_WATT, "label": "Leistungs-Sensor (Watt)"},
+    {"value": SENSOR_TYPE_GAS, "label": "Gas-Sensor (m³)"},
+    {"value": SENSOR_TYPE_WATER, "label": "Wasser-Sensor (L oder m³)"},
 ]
