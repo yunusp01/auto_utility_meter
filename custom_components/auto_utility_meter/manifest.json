@@ -1,12 +1,11 @@
 {
   "domain": "auto_utility_meter",
   "name": "Auto Utility Meter",
-  "version": "1.1.0",
-  "config_flow": true,
-  "documentation": "https://github.com/yunusp01/auto_utility_meter",
-  "issue_tracker": "https://github.com/yunusp01/auto_utility_meter/issues",
-  "dependencies": ["utility_meter", "integration"],
   "codeowners": ["@yunusp01"],
-  "iot_class": "calculated"
+  "config_flow": true,
+  "dependencies": ["utility_meter", "integration"],
+  "documentation": "https://github.com/yunusp01/auto_utility_meter",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/yunusp01/auto_utility_meter/issues",
+  "version": "1.1.0"
 }
-
