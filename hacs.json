@@ -1,6 +1,5 @@
 {
   "name": "Auto Utility Meter",
   "render_readme": true,
-  "country": "DE",
   "homeassistant": "2024.1.0"
 }
