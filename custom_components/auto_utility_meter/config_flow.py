@@ -19,7 +19,7 @@ from .const import (
     SENSOR_TYPE_OPTIONS
 )
 
-# Erlaubte Einheiten für die Validierung
+# Allowed units for validation
 VALID_UNITS = {
     SENSOR_TYPE_WATT: ["W", "kW"],
     SENSOR_TYPE_KWH: ["Wh", "kWh", "MWh"],
@@ -28,13 +28,13 @@ VALID_UNITS = {
 }
 
 class AutoUtilityMeterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Setup-Flow für die Ersteinrichtung."""
+    """Setup flow for the initial configuration."""
     VERSION = 1
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         errors = {}
         if user_input is not None:
-            # Validierung der Einheit
+            # Validate the unit
             source_entity_id = user_input[CONF_SOURCE_SENSOR]
             sensor_type = user_input[CONF_SENSOR_TYPE]
             
@@ -74,18 +74,15 @@ class AutoUtilityMeterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: config_entries.ConfigEntry):
-        return AutoUtilityMeterOptionsFlowHandler(config_entry)
+        return AutoUtilityMeterOptionsFlowHandler()
 
 class AutoUtilityMeterOptionsFlowHandler(config_entries.OptionsFlow):
-    """Verwaltet das Zahnrad-Menü (Optionen)."""
-
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self.config_entry = config_entry
+    """Manages the options (gear icon) menu."""
 
     async def async_step_init(self, user_input=None) -> FlowResult:
         errors = {}
         if user_input is not None:
-            # Gleiche Validierung wie im Haupt-Flow
+            # Same validation as in the main flow
             source_entity_id = user_input[CONF_SOURCE_SENSOR]
             sensor_type = user_input[CONF_SENSOR_TYPE]
             

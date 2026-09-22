@@ -9,16 +9,16 @@ SENSOR_TYPE_GAS = "gas"
 SENSOR_TYPE_WATER = "water"
 
 INTERVAL_OPTIONS = [
-    {"value": "hourly", "label": "Stündlich"},
-    {"value": "daily", "label": "Täglich"},
-    {"value": "weekly", "label": "Wöchentlich"},
-    {"value": "monthly", "label": "Monatlich"},
-    {"value": "yearly", "label": "Jährlich"},
+    {"value": "hourly", "label": "Hourly"},
+    {"value": "daily", "label": "Daily"},
+    {"value": "weekly", "label": "Weekly"},
+    {"value": "monthly", "label": "Monthly"},
+    {"value": "yearly", "label": "Yearly"},
 ]
 
 SENSOR_TYPE_OPTIONS = [
-    {"value": SENSOR_TYPE_KWH, "label": "Energie-Sensor (kWh)"},
-    {"value": SENSOR_TYPE_WATT, "label": "Leistungs-Sensor (Watt)"},
-    {"value": SENSOR_TYPE_GAS, "label": "Gas-Sensor (m³)"},
-    {"value": SENSOR_TYPE_WATER, "label": "Wasser-Sensor (L oder m³)"},
+    {"value": SENSOR_TYPE_KWH, "label": "Energy Sensor (kWh)"},
+    {"value": SENSOR_TYPE_WATT, "label": "Power Sensor (Watt)"},
+    {"value": SENSOR_TYPE_GAS, "label": "Gas Sensor (m³)"},
+    {"value": SENSOR_TYPE_WATER, "label": "Water Sensor (L or m³)"},
 ]
