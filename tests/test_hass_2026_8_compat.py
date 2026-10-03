@@ -39,8 +39,13 @@ commands and output):
   resolve -- unrelated machinery this fix doesn't touch and isn't worth
   standing up for this test. Backward compatibility (that `hass` is still
   forwarded when the installed signature still accepts it) is instead
-  covered directly, without needing that machinery, by
-  `test_hass_still_forwarded_when_parent_signature_accepts_it` below.
+  covered, without needing that machinery, by
+  `test_hass_still_forwarded_when_parent_signature_accepts_it` (for
+  `_create_integration_sensor`) and
+  `test_utility_meter_hass_still_forwarded_when_parent_signature_accepts_it`
+  (for `AutoUtilityMeterSensor`) below. Those two patch the parent
+  `__init__` to the pre-2026.8 shape, so they check the forwarding logic,
+  not the real pre-2026.8 constructor body.
 """
 
 from __future__ import annotations
@@ -80,15 +85,16 @@ class _FakeHass:
     ever calls a method on this object — a real `HomeAssistant` instance
     would be inert cargo for this specific test. What IS real: the parent
     class, its full `__init__` body, and this repo's own wrapper logic.
+
+    This stand-in is NOT enough for the pre-2026.8 constructors: there,
+    `async_entity_id_to_device(hass, source_entity)` reaches the storage
+    manager and fails with `AttributeError: ... has no attribute 'config'`.
+    That is why the two "against_real_class" tests skip on pre-2026.8 HA.
     """
 
     def __init__(self) -> None:
-        # Pre-2026.8, IntegrationSensor/UtilityMeterSensor.__init__ call
-        # `async_entity_id_to_device(hass, source_entity)`, which needs a
-        # `.data` dict to do its (empty, in this test) registry lookups
-        # against. Giving it one lets the pre-2026.8 constructor path run to
-        # completion too, instead of crashing on an unrelated AttributeError,
-        # for anyone running this suite against an older `homeassistant`.
+        # Only gets the pre-2026.8 path past `hass.data`; it still stops at
+        # `hass.config` (see above). Unused on 2026.8+.
         self.data: dict = {}
 
 
@@ -190,3 +196,41 @@ def test_hass_still_forwarded_when_parent_signature_accepts_it(monkeypatch):
 
     assert isinstance(sensor, IntegrationSensor)
     assert captured["hass"] is hass_marker
+
+
+def test_utility_meter_hass_still_forwarded_when_parent_signature_accepts_it(monkeypatch):
+    """Backward-compat guard for `AutoUtilityMeterSensor`, the twin of the
+    test above: on HA versions whose `UtilityMeterSensor.__init__` still
+    requires `hass` (pre-2026.8), the subclass must keep forwarding it.
+
+    `UtilityMeterSensor.__init__` is patched to the pre-2026.8 shape (a
+    required `hass` plus keyword arguments), so this checks the real
+    `AutoUtilityMeterSensor.__init__` forwarding logic without needing a
+    functional `HomeAssistant` for `async_entity_id_to_device`. Without the
+    `inspect.signature` guard forwarding `hass`, the call raises
+    `TypeError: ... missing 1 required positional argument: 'hass'`.
+    """
+    captured = {}
+
+    def fake_init(self, hass, **kwargs):
+        captured["hass"] = hass
+        captured.update(kwargs)
+
+    monkeypatch.setattr(UtilityMeterSensor, "__init__", fake_init)
+
+    hass_marker = _FakeHass()
+    sensor = AutoUtilityMeterSensor(
+        hass_marker,
+        source_entity="sensor.x_total_energy",
+        name="X Daily Energy",
+        interval="daily",
+        unique_id="x_daily",
+        device_info=None,
+        object_id="x_daily_energy",
+        sensor_type="watt",
+    )
+
+    assert isinstance(sensor, UtilityMeterSensor)
+    assert captured["hass"] is hass_marker
+    assert captured["source_entity"] == "sensor.x_total_energy"
+    assert captured["unique_id"] == "x_daily"
