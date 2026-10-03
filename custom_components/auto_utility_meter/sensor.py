@@ -1,3 +1,4 @@
+import inspect
 import logging
 from datetime import timedelta
 from typing import Any
@@ -21,6 +22,37 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _create_integration_sensor(
+    hass,
+    *,
+    source_entity_id: str,
+    name: str,
+    unique_id: str,
+) -> IntegrationSensor:
+    """Build the Riemann-sum integration sensor.
+
+    HA 2026.8 (home-assistant/core#177596, merged 2026-07-30) dropped `hass`
+    from `IntegrationSensor.__init__` entirely and made every remaining
+    parameter keyword-only. That's not in HA's official breaking-changes
+    list (the core team treats this constructor as internal API), so only
+    pass `hass` through when the installed version still accepts it.
+    """
+    kwargs: dict[str, Any] = dict(
+        source_entity=source_entity_id,
+        name=name,
+        round_digits=3,
+        unit_prefix="k",
+        unit_time="h",
+        integration_method="left",
+        unique_id=unique_id,
+        max_sub_interval=timedelta(seconds=20),
+    )
+    if "hass" in inspect.signature(IntegrationSensor.__init__).parameters:
+        kwargs["hass"] = hass
+    return IntegrationSensor(**kwargs)
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     """Setup der Sensoren (Integral und Utility Meter)."""
@@ -59,16 +91,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
         total_name_suffix = translations.get(f"component.{DOMAIN}.entity.sensor.total_energy.name", "Total Energy")
         total_full_name = f"{clean_base} {total_name_suffix}"
         
-        energy_integral_sensor = IntegrationSensor(
-            hass=hass,
-            source_entity=source_entity_id,
+        energy_integral_sensor = _create_integration_sensor(
+            hass,
+            source_entity_id=source_entity_id,
             name=total_full_name,
-            round_digits=3,
-            unit_prefix="k",
-            unit_time="h",
-            integration_method="left",
             unique_id=integral_unique_id,
-            max_sub_interval=timedelta(seconds=20)
         )
         
         energy_integral_sensor.entity_id = f"sensor.{integral_obj_id}"
@@ -121,10 +148,13 @@ class AutoUtilityMeterSensor(UtilityMeterSensor):
         self.entity_id = f"sensor.{object_id}"
         self._attr_unique_id = unique_id
         self._attr_name = name
-        self._attr_translation_key = interval 
+        self._attr_translation_key = interval
 
-        super().__init__(
-            hass=hass,
+        # HA 2026.8 (home-assistant/core#177603, merged 2026-07-30) dropped
+        # `hass` from `UtilityMeterSensor.__init__` the same way it did for
+        # IntegrationSensor above -- only forward it when the installed
+        # version still accepts it.
+        utility_meter_kwargs: dict[str, Any] = dict(
             source_entity=source_entity,
             name=name,
             meter_type=interval,
@@ -137,8 +167,11 @@ class AutoUtilityMeterSensor(UtilityMeterSensor):
             periodically_resetting=True,
             tariff_entity=None,
             tariff=None,
-            sensor_always_available=False
+            sensor_always_available=False,
         )
+        if "hass" in inspect.signature(UtilityMeterSensor.__init__).parameters:
+            utility_meter_kwargs["hass"] = hass
+        super().__init__(**utility_meter_kwargs)
         self._attr_device_info = device_info
         self._parent_meter = unique_id
         
